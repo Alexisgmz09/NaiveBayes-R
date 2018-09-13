@@ -1,0 +1,434 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Naive Bayes},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+  \title{Naive Bayes}
+  \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+  \author{}
+  \preauthor{}\postauthor{}
+  \date{}
+  \predate{}\postdate{}
+
+
+\begin{document}
+\maketitle
+
+\subsubsection{Ejemplo de Naive Bayes hecho en R sin utilizar librerias
+externas}\label{ejemplo-de-naive-bayes-hecho-en-r-sin-utilizar-librerias-externas}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Creamos un Data frame con las columnas:}
+\CommentTok{# Sexo, Altura, Peso, Tamanio_pie }
+\NormalTok{data <-}\StringTok{  }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{sexo =} \KeywordTok{c}\NormalTok{(}\StringTok{'hombre'}\NormalTok{,}\StringTok{'hombre'}\NormalTok{,}\StringTok{'hombre'}\NormalTok{,}\StringTok{'hombre'}\NormalTok{,}
+                          \StringTok{'mujer'}\NormalTok{,}\StringTok{'mujer'}\NormalTok{,}\StringTok{'mujer'}\NormalTok{,}\StringTok{'mujer'}\NormalTok{),}
+                  \DataTypeTok{altura=}\KeywordTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\FloatTok{5.92}\NormalTok{,}\FloatTok{5.58}\NormalTok{,}\FloatTok{5.92}\NormalTok{,}\DecValTok{5}\NormalTok{,}\FloatTok{5.5}\NormalTok{,}\FloatTok{5.42}\NormalTok{,}\FloatTok{5.75}\NormalTok{),}
+                  \DataTypeTok{peso=}\KeywordTok{c}\NormalTok{(}\DecValTok{180}\NormalTok{,}\DecValTok{190}\NormalTok{,}\DecValTok{170}\NormalTok{,}\DecValTok{165}\NormalTok{,}\DecValTok{100}\NormalTok{,}\DecValTok{150}\NormalTok{,}\DecValTok{130}\NormalTok{,}\DecValTok{150}\NormalTok{),}
+                  \DataTypeTok{tamanio_pie=}\KeywordTok{c}\NormalTok{(}\DecValTok{12}\NormalTok{,}\DecValTok{11}\NormalTok{,}\DecValTok{12}\NormalTok{,}\DecValTok{10}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{7}\NormalTok{,}\DecValTok{9}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     sexo altura peso tamanio_pie
+## 1 hombre   6.00  180          12
+## 2 hombre   5.92  190          11
+## 3 hombre   5.58  170          12
+## 4 hombre   5.92  165          10
+## 5  mujer   5.00  100           6
+## 6  mujer   5.50  150           8
+## 7  mujer   5.42  130           7
+## 8  mujer   5.75  150           9
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Creamos un DataFrame para guardar los valores de que queremos probar.}
+\NormalTok{persona =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{altura=}\KeywordTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{),}
+                     \DataTypeTok{peso=}\KeywordTok{c}\NormalTok{(}\DecValTok{130}\NormalTok{),}
+                     \DataTypeTok{tamanio_pies=}\KeywordTok{c}\NormalTok{(}\DecValTok{8}\NormalTok{))}
+\NormalTok{persona}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   altura peso tamanio_pies
+## 1      6  130            8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#  Numero de hombres}
+\NormalTok{n_hombres <-}\StringTok{ }\KeywordTok{nrow}\NormalTok{(}\KeywordTok{subset}\NormalTok{(data, data}\OperatorTok{$}\NormalTok{sexo }\OperatorTok{==}\StringTok{ 'hombre'}\NormalTok{))}
+\KeywordTok{print}\NormalTok{(n_hombres)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Numero de mujeres}
+\NormalTok{n_mujeres <-}\StringTok{ }\KeywordTok{nrow}\NormalTok{(}\KeywordTok{subset}\NormalTok{(data, data}\OperatorTok{$}\NormalTok{sexo }\OperatorTok{==}\StringTok{ 'mujer'}\NormalTok{))}
+\KeywordTok{print}\NormalTok{(n_mujeres)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Numero de registros}
+\NormalTok{n_registros=}\KeywordTok{nrow}\NormalTok{(data)}
+\KeywordTok{print}\NormalTok{(n_registros)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 8
+\end{verbatim}
+
+\subsubsection{Calculamos las probailidades
+previas}\label{calculamos-las-probailidades-previas}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Probabilidad de hombres}
+\NormalTok{p_hombres <-}\StringTok{ }\NormalTok{n_hombres}\OperatorTok{/}\NormalTok{n_registros}
+\KeywordTok{print}\NormalTok{(p_hombres)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Probabilidad de mujeres}
+\NormalTok{p_mujeres =}\StringTok{ }\NormalTok{n_mujeres}\OperatorTok{/}\NormalTok{n_registros}
+\KeywordTok{print}\NormalTok{(p_mujeres)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Media de cada variable por sexo}
+\NormalTok{data_mean <-}\StringTok{ }\NormalTok{data }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(sexo) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}
+    \DataTypeTok{peso =} \KeywordTok{mean}\NormalTok{(peso),}
+    \DataTypeTok{altura =} \KeywordTok{mean}\NormalTok{(altura),}
+    \DataTypeTok{tamanio_pie =} \KeywordTok{mean}\NormalTok{(tamanio_pie)}
+\NormalTok{    )}
+\KeywordTok{print}\NormalTok{(data_mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 4
+##   sexo    peso altura tamanio_pie
+##   <fct>  <dbl>  <dbl>       <dbl>
+## 1 hombre  176.   5.86       11.2 
+## 2 mujer   132.   5.42        7.50
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Varianza de cada variable por sexo}
+\NormalTok{data_var <-}\StringTok{ }\NormalTok{data }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(sexo) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}
+    \DataTypeTok{peso =} \KeywordTok{var}\NormalTok{(peso),}
+    \DataTypeTok{altura =} \KeywordTok{var}\NormalTok{(altura),}
+    \DataTypeTok{tamanio_pie =} \KeywordTok{var}\NormalTok{(tamanio_pie)}
+\NormalTok{    )}
+\KeywordTok{print}\NormalTok{(data_var)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 4
+##   sexo    peso altura tamanio_pie
+##   <fct>  <dbl>  <dbl>       <dbl>
+## 1 hombre  123. 0.0350       0.917
+## 2 mujer   558. 0.0972       1.67
+\end{verbatim}
+
+\subsubsection{Calculamos la Probabilidad y Varianza de
+hombre}\label{calculamos-la-probabilidad-y-varianza-de-hombre}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Media para hombre}
+\NormalTok{mean_hombres <-}\StringTok{ }\NormalTok{data_mean }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(sexo}\OperatorTok{==}\StringTok{'hombre'}\NormalTok{) }
+\KeywordTok{print}\NormalTok{(mean_hombres)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 4
+##   sexo    peso altura tamanio_pie
+##   <fct>  <dbl>  <dbl>       <dbl>
+## 1 hombre  176.   5.86        11.2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Varianza para hombre}
+\NormalTok{var_hombres <-}\StringTok{ }\NormalTok{data_var }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(sexo}\OperatorTok{==}\StringTok{'hombre'}\NormalTok{) }
+\KeywordTok{print}\NormalTok{(var_hombres)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 4
+##   sexo    peso altura tamanio_pie
+##   <fct>  <dbl>  <dbl>       <dbl>
+## 1 hombre  123. 0.0350       0.917
+\end{verbatim}
+
+\subsubsection{Calculamos la Probabilidad y Varianza de
+mujer}\label{calculamos-la-probabilidad-y-varianza-de-mujer}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Media para muejer}
+\NormalTok{mean_mujeres <-}\StringTok{ }\NormalTok{data_mean }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(sexo}\OperatorTok{==}\StringTok{'mujer'}\NormalTok{) }
+\KeywordTok{print}\NormalTok{(mean_hombres)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 4
+##   sexo    peso altura tamanio_pie
+##   <fct>  <dbl>  <dbl>       <dbl>
+## 1 hombre  176.   5.86        11.2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Varianza para mujer}
+\NormalTok{var_mujeres <-}\StringTok{ }\NormalTok{data_var }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(sexo}\OperatorTok{==}\StringTok{'mujer'}\NormalTok{) }
+\KeywordTok{print}\NormalTok{(var_hombres)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 4
+##   sexo    peso altura tamanio_pie
+##   <fct>  <dbl>  <dbl>       <dbl>
+## 1 hombre  123. 0.0350       0.917
+\end{verbatim}
+
+\subsubsection{Función para calcular la probabildad de X dado
+Y}\label{funcion-para-calcular-la-probabildad-de-x-dado-y}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p_x_d_y <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, mean_x, var_y)\{}
+  \KeywordTok{return}\NormalTok{ ((}\DecValTok{1}\OperatorTok{/}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(var_y)}\OperatorTok{*}\StringTok{ }\KeywordTok{sqrt}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{pi)))}\OperatorTok{*}\StringTok{ }\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\OperatorTok{*}\NormalTok{((x}\OperatorTok{-}\NormalTok{mean_x)}\OperatorTok{^}\DecValTok{2}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{var_y))))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Calculamos la Probabilidad de que sea
+Hombre}\label{calculamos-la-probabilidad-de-que-sea-hombre}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{condicion_hombre <-}\StringTok{ }\NormalTok{p_hombres }\OperatorTok{*}\StringTok{ }\KeywordTok{p_x_d_y}\NormalTok{(persona}\OperatorTok{$}\NormalTok{altura,mean_hombres}\OperatorTok{$}\NormalTok{altura,var_hombres}\OperatorTok{$}\NormalTok{altura) }\OperatorTok{*}\StringTok{ }\KeywordTok{p_x_d_y}\NormalTok{(persona}\OperatorTok{$}\NormalTok{peso,mean_hombres}\OperatorTok{$}\NormalTok{peso,var_hombres}\OperatorTok{$}\NormalTok{peso) }\OperatorTok{*}\StringTok{ }\KeywordTok{p_x_d_y}\NormalTok{(persona}\OperatorTok{$}\NormalTok{tamanio_pies,mean_hombres}\OperatorTok{$}\NormalTok{tamanio_pie,var_hombres}\OperatorTok{$}\NormalTok{tamanio_pie)}
+\KeywordTok{print}\NormalTok{(condicion_hombre)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6.197072e-09
+\end{verbatim}
+
+\subsubsection{Calculamos la Probabilidad de que sea
+Mujer}\label{calculamos-la-probabilidad-de-que-sea-mujer}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{condicion_mujer <-}\StringTok{ }\NormalTok{p_mujeres }\OperatorTok{*}\StringTok{ }\KeywordTok{p_x_d_y}\NormalTok{(persona}\OperatorTok{$}\NormalTok{altura,mean_mujeres}\OperatorTok{$}\NormalTok{altura,var_mujeres}\OperatorTok{$}\NormalTok{altura) }\OperatorTok{*}\StringTok{ }\KeywordTok{p_x_d_y}\NormalTok{(persona}\OperatorTok{$}\NormalTok{peso,mean_mujeres}\OperatorTok{$}\NormalTok{peso,var_mujeres}\OperatorTok{$}\NormalTok{peso) }\OperatorTok{*}\StringTok{ }\KeywordTok{p_x_d_y}\NormalTok{(persona}\OperatorTok{$}\NormalTok{tamanio_pies,mean_mujeres}\OperatorTok{$}\NormalTok{tamanio_pie,var_mujeres}\OperatorTok{$}\NormalTok{tamanio_pie)}
+\KeywordTok{print}\NormalTok{(condicion_mujer)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.0005377909
+\end{verbatim}
+
+\subsubsection{Decidimos cual es la probabilidad
+mayor}\label{decidimos-cual-es-la-probabilidad-mayor}
+
+\paragraph{Decimos el resultado}\label{decimos-el-resultado}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{(condicion_hombre}\OperatorTok{>}\NormalTok{condicion_mujer)\{}
+  \KeywordTok{print}\NormalTok{(}\StringTok{'Hombre'}\NormalTok{)}
+\NormalTok{\}}\ControlFlowTok{else}\NormalTok{\{}
+  \KeywordTok{print}\NormalTok{(}\StringTok{'Mujer'}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Mujer"
+\end{verbatim}
+
+
+\end{document}

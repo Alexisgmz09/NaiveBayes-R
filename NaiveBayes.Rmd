@@ -1,0 +1,121 @@
+---
+title: "Naive Bayes"
+output:
+  html_document:
+    df_print: kable
+  pdf_document: default
+---
+###Ejemplo de Naive Bayes hecho en R utilizando DPLYR para el manejo de Data Frames
+```{r}
+#Caragamos dplyr
+library(dplyr)
+# Creamos un Data frame con las columnas:
+# Sexo, Altura, Peso, Tamanio_pie 
+data <-  data.frame(sexo = c('hombre','hombre','hombre','hombre',
+                          'mujer','mujer','mujer','mujer'),
+                  altura=c(6,5.92,5.58,5.92,5,5.5,5.42,5.75),
+                  peso=c(180,190,170,165,100,150,130,150),
+                  tamanio_pie=c(12,11,12,10,6,8,7,9))
+```
+
+```{r}
+data
+```
+
+```{r}
+# Creamos un DataFrame para guardar los valores de que queremos probar.
+persona = data.frame(altura=c(6),
+                     peso=c(130),
+                     tamanio_pies=c(8))
+persona
+```
+
+```{r}
+#  Numero de hombres
+n_hombres <- nrow(subset(data, data$sexo == 'hombre'))
+print(n_hombres)
+# Numero de mujeres
+n_mujeres <- nrow(subset(data, data$sexo == 'mujer'))
+print(n_mujeres)
+# Numero de registros
+n_registros=nrow(data)
+print(n_registros)
+```
+###Calculamos las probailidades previas
+```{r}
+# Probabilidad de hombres
+p_hombres <- n_hombres/n_registros
+print(p_hombres)
+# Probabilidad de mujeres
+p_mujeres = n_mujeres/n_registros
+print(p_mujeres)
+# Media de cada variable por sexo
+data_mean <- data %>% 
+  group_by(sexo) %>% 
+  summarise(
+    peso = mean(peso),
+    altura = mean(altura),
+    tamanio_pie = mean(tamanio_pie)
+    )
+print(data_mean)
+# Varianza de cada variable por sexo
+data_var <- data %>% 
+  group_by(sexo) %>% 
+  summarise(
+    peso = var(peso),
+    altura = var(altura),
+    tamanio_pie = var(tamanio_pie)
+    )
+print(data_var)
+```
+###Calculamos la Probabilidad y Varianza de hombre 
+```{r}
+# Media para hombre
+mean_hombres <- data_mean %>% 
+  filter(sexo=='hombre') 
+print(mean_hombres)
+#Varianza para hombre
+var_hombres <- data_var %>% 
+  filter(sexo=='hombre') 
+print(var_hombres)
+```
+###Calculamos la Probabilidad y Varianza de mujer
+```{r}
+# Media para muejer
+mean_mujeres <- data_mean %>% 
+  filter(sexo=='mujer') 
+print(mean_hombres)
+#Varianza para mujer
+var_mujeres <- data_var %>% 
+  filter(sexo=='mujer') 
+print(var_hombres)
+```
+
+###Función para calcular la probabildad de X dado Y
+```{r}
+p_x_d_y <- function(x, mean_x, var_y){
+  return ((1/(sqrt(var_y)* sqrt(2*pi)))* exp(-1*((x-mean_x)^2/(2*var_y))))
+}
+```
+###Calculamos la Probabilidad de que sea Hombre
+```{r}
+condicion_hombre <- p_hombres * p_x_d_y(persona$altura,mean_hombres$altura,var_hombres$altura) * p_x_d_y(persona$peso,mean_hombres$peso,var_hombres$peso) * p_x_d_y(persona$tamanio_pies,mean_hombres$tamanio_pie,var_hombres$tamanio_pie)
+print(condicion_hombre)
+```
+###Calculamos la Probabilidad de que sea Mujer
+
+```{r}
+condicion_mujer <- p_mujeres * p_x_d_y(persona$altura,mean_mujeres$altura,var_mujeres$altura) * p_x_d_y(persona$peso,mean_mujeres$peso,var_mujeres$peso) * p_x_d_y(persona$tamanio_pies,mean_mujeres$tamanio_pie,var_mujeres$tamanio_pie)
+print(condicion_mujer)
+```
+
+###Decidimos cual es la probabilidad mayor
+####Decimos el resultado
+```{r}
+if(condicion_hombre>condicion_mujer){
+  print('Hombre')
+}else{
+  print('Mujer')
+}
+```
+
